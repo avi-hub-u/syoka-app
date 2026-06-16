@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>わたしの書庫</title>
+<title>わたしの書架</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -651,27 +651,9 @@ const platformMeta = {
   other:   { label: 'その他',       color: 'var(--p-other)' },
 };
 
-let books = [
-  { id: 1, title: '夜と霧', author: 'V.E.フランクル', genre: 'philosophy', date: '2026-05-12',
-    comment: '何度読んでも、苦しみそのものではなく、それにどう意味を見出すかという視点に立ち返らされる。\n今のタイミングで読み返すと、また違う部分が刺さった。' },
-  { id: 2, title: '猫を棄てる', author: '村上春樹', genre: 'essay', date: '2026-05-28',
-    comment: '父親との距離感の描き方が静かで、でも芯にあるものはずっと熱い。\n短い分量なのに、読み終えた後の余韻が長い。' },
-  { id: 3, title: '小さな会社の生き残る道', author: '今井ひろみ', genre: 'business', date: '2026-06-02',
-    comment: '地方の中小企業向けの考え方が多くて、自分が目指している方向と重なる部分が多かった。\nメモを取りながら読んだ。' },
-  { id: 4, title: '夜のピクニック', author: '恩田陸', genre: 'novel', date: '2026-06-08',
-    comment: '高校生たちの一晩の物語なのに、読んでいる間ずっと自分も歩いている感覚になった。\nラストの一言がじわっと効く。' },
-  { id: 5, title: 'ヴィンランド・サガ 1', author: '幸村誠', genre: 'manga', date: '2026-06-10',
-    comment: '絵の密度がすごい。1巻だけでもう続きが気になって仕方ない。' },
-];
+let books = [];
 
-let videos = [
-  { id: 101, title: '花束みたいな恋をした', platform: 'amazon', date: '2026-04-18',
-    comment: '価値観が近い二人が少しずつずれていく過程が、誰のことでもあるように見えて苦しかった。\n細かい会話の積み重ねが効いている。' },
-  { id: 102, title: 'silent', platform: 'netflix', date: '2026-05-05',
-    comment: '音のない演出が多いのに、感情の動きがはっきり伝わってくる。\n手話のシーンの間の取り方が好き。' },
-  { id: 103, title: 'プラネット・アース', platform: 'theater', date: '2026-05-30',
-    comment: '映像の迫力がすごくて、大きい画面で観てよかったと思った。' },
-];
+let videos = [];
 
 let nextId = 200;
 let currentType = 'book';
@@ -883,8 +865,8 @@ function openItem(el, item, type) {
     overlay.classList.add('show');
     card.classList.add('show');
     const vw = window.innerWidth, vh = window.innerHeight;
-    const w = Math.min(vw * 0.9, 380);
-    const h = Math.min(vh * 0.78, 580);
+    const w = Math.min(vw * 0.8, 380);
+    const h = Math.min(vh * 0.68, 580);
     card.style.left = ((vw - w) / 2) + 'px';
     card.style.top = ((vh - h) / 2) + 'px';
     card.style.width = w + 'px';
