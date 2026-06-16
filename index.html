@@ -962,6 +962,8 @@ fab.addEventListener('click', () => {
   formTitle.textContent = isBook ? '本を記録する' : '映画・ドラマを記録する';
   fieldBook.style.display = isBook ? 'block' : 'none';
   fieldVideo.style.display = isBook ? 'none' : 'block';
+  entryForm.reset();
+  editingId = null;
   formSheet.classList.add('open');
   formBackdrop.classList.add('open');
 });
