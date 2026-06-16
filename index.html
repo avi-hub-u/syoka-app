@@ -241,7 +241,7 @@
     justify-content: center;
     padding: 12px 0 10px;
     font-family: 'Shippori Mincho', serif;
-    font-size: 13px;
+    font-size: 12px;
     letter-spacing: .15em;
     color: rgba(255,255,255,.92);
     text-shadow: 0 1px 2px rgba(0,0,0,.35);
@@ -477,6 +477,29 @@
     justify-content: center;
     z-index: 5;
   }
+  .cover-actions {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  z-index: 5;
+}
+.cover-edit, .cover-delete {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 11px;
+  letter-spacing: .1em;
+  padding: 5px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.4);
+  background: rgba(0,0,0,.3);
+  color: #fff;
+  cursor: pointer;
+}
+.cover-delete {
+  border-color: rgba(200,80,80,.6);
+  color: #ffaaaa;
+}
 
   /* ---------- FAB + form ---------- */
   .fab {
@@ -657,6 +680,7 @@ let videos = [];
 
 let nextId = 200;
 let currentType = 'book';
+let editingId = null;  
 
 /* ---------- localStorage ---------- */
 const STORAGE_KEY_BOOKS = 'shoko-books';
@@ -798,6 +822,10 @@ function buildCoverCard(item, type) {
     <div class="cover-card-inner">
       <div class="cover-accent" style="background:${accentColor}"></div>${decor}
       <button class="cover-close">✕</button>
+      <div class="cover-actions">
+  <button class="cover-edit">編集</button>
+  <button class="cover-delete">削除</button>
+</div>
       <div class="cover-main">
         <h2>${item.title}</h2>
         ${titleRule}
@@ -857,6 +885,37 @@ function openItem(el, item, type) {
   }
 
   card.querySelector('.cover-close').addEventListener('click', close);
+  card.querySelector('.cover-edit').addEventListener('click', () => {
+  close();
+  const isBook = type === 'book';
+  formTitle.textContent = isBook ? '本を編集する' : '映画・ドラマを編集する';
+  fieldBook.style.display = isBook ? 'block' : 'none';
+  fieldVideo.style.display = isBook ? 'none' : 'block';
+  entryForm.title.value = item.title;
+  if (isBook) {
+    entryForm.author.value = item.author || '';
+    entryForm.genre.value = item.genre;
+  } else {
+    entryForm.platform.value = item.platform;
+  }
+  entryForm.date.value = item.date || '';
+  entryForm.comment.value = item.comment || '';
+  editingId = item.id;
+  formSheet.classList.add('open');
+  formBackdrop.classList.add('open');
+});
+
+card.querySelector('.cover-delete').addEventListener('click', () => {
+  if (!confirm(`「${item.title}」を削除しますか？`)) return;
+  if (type === 'book') {
+    books = books.filter(b => b.id !== item.id);
+  } else {
+    videos = videos.filter(v => v.id !== item.id);
+  }
+  saveData();
+  renderCabinet();
+  overlay.remove();
+});
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) close();
   });
@@ -923,23 +982,21 @@ entryForm.addEventListener('submit', (e) => {
   const title = fd.get('title').trim();
   if (!title) return;
 
-  if (currentType === 'book') {
-    books.push({
-      id: nextId++,
-      title,
-      author: fd.get('author').trim(),
-      genre: fd.get('genre'),
-      date: fd.get('date'),
-      comment: fd.get('comment').trim(),
-    });
+  if (editingId !== null) {
+    if (currentType === 'book') {
+      const idx = books.findIndex(b => b.id === editingId);
+      if (idx !== -1) books[idx] = { id: editingId, title, author: fd.get('author').trim(), genre: fd.get('genre'), date: fd.get('date'), comment: fd.get('comment').trim() };
+    } else {
+      const idx = videos.findIndex(v => v.id === editingId);
+      if (idx !== -1) videos[idx] = { id: editingId, title, platform: fd.get('platform'), date: fd.get('date'), comment: fd.get('comment').trim() };
+    }
+    editingId = null;
   } else {
-    videos.push({
-      id: nextId++,
-      title,
-      platform: fd.get('platform'),
-      date: fd.get('date'),
-      comment: fd.get('comment').trim(),
-    });
+    if (currentType === 'book') {
+      books.push({ id: nextId++, title, author: fd.get('author').trim(), genre: fd.get('genre'), date: fd.get('date'), comment: fd.get('comment').trim() });
+    } else {
+      videos.push({ id: nextId++, title, platform: fd.get('platform'), date: fd.get('date'), comment: fd.get('comment').trim() });
+    }
   }
 
   entryForm.reset();
