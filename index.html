@@ -590,12 +590,13 @@
     color: #2c2018;
   }
 </style>
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#18120e">
-<link rel="apple-touch-icon" href="icon.png">
+
+<link rel="apple-touch-icon" href="/icon.png">
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js');
+    navigator.serviceWorker.register('/sw.js');
   }
 </script>
 </head>
