@@ -1,8 +1,8 @@
 const CACHE_NAME = 'watashi-no-shoka-v1';
 const ASSETS = [
-  './',
-  './index.html',
-  './icon.png'
+  '/',
+  '/index.html',
+  '/icon.png'
 ];
 
 // インストール時にキャッシュ
