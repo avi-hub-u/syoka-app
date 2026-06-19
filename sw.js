@@ -1,4 +1,4 @@
-const CACHE_NAME = 'watashi-no-shoka-v10';
+const CACHE_NAME = 'watashi-no-shoka-v11';
 const ASSETS = [
   './',
   './index.html',
