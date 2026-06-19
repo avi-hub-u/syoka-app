@@ -778,11 +778,21 @@ function makeDvdEl(item) {
   const el = document.createElement('div');
   el.className = 'item dvd';
   el.dataset.id = item.id;
-  el.innerHTML = `
-    <div class="spine-line"></div>
-    <div class="title">${item.title}</div>
-    <div class="tag" style="background:${platformMeta[item.platform].color}">${platformMeta[item.platform].label}</div>
-  `;
+  if (item.poster) {
+    el.style.padding = '0';
+    el.style.backgroundImage = `url(${item.poster})`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+    el.innerHTML = `
+      <div class="tag" style="background:${platformMeta[item.platform].color}; margin:8px;">${platformMeta[item.platform].label}</div>
+    `;
+  } else {
+    el.innerHTML = `
+      <div class="spine-line"></div>
+      <div class="title">${item.title}</div>
+      <div class="tag" style="background:${platformMeta[item.platform].color}">${platformMeta[item.platform].label}</div>
+    `;
+  }
   return el;
 }
 
@@ -834,7 +844,7 @@ function buildCoverCard(item, type) {
     badgeLabel = genreMeta[item.genre].label;
     metaHTML = `<span>${item.author || '—'}</span><span>${item.date || ''}</span>`;
   } else {
-    bg = 'linear-gradient(160deg, #2a323e 0%, #1c222b 100%)';
+   bg = item.poster ? `url(${item.poster}) center/cover` : 'linear-gradient(160deg, #2a323e 0%, #1c222b 100%)';
     accentColor = platformMeta[item.platform].color;
     badgeLabel = platformMeta[item.platform].label;
     metaHTML = `<span>${item.date || ''}</span>`;
