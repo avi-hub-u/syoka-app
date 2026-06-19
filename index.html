@@ -516,7 +516,23 @@
     cursor: pointer;
     z-index: 12;
   }
-
+.fab-small {
+  position: fixed;
+  right: 22px;
+  width: auto;
+  height: auto;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.3);
+  background: rgba(24,18,14,.85);
+  color: var(--paper);
+  font-family: 'Shippori Mincho', serif;
+  font-size: 12px;
+  letter-spacing: .08em;
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+  cursor: pointer;
+  z-index: 12;
+}
   .form-backdrop {
     position: fixed; inset: 0;
     background: rgba(0,0,0,.45);
@@ -619,6 +635,9 @@
 </div>
 
 <button class="fab" id="fab">＋</button>
+  <button class="fab-small" id="export-btn" style="right:22px; bottom:84px;">保存</button>
+<button class="fab-small" id="import-btn" style="right:22px; bottom:130px;">復元</button>
+<input type="file" id="import-file-input" accept="application/json" style="display:none;">
 
 <div class="form-backdrop" id="form-backdrop"></div>
 <div class="form-sheet" id="form-sheet">
@@ -1016,7 +1035,67 @@ entryForm.addEventListener('submit', (e) => {
   saveData();
   renderCabinet();
 });
+  
+/* ---------- 保存 / 復元 ---------- */
+function exportData() {
+  const data = {
+    books: books,
+    videos: videos,
+    exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const today = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `watashino-shoka-backup-${today}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
+function importData(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!Array.isArray(data.books) || !Array.isArray(data.videos)) {
+        alert('このファイルは正しいバックアップ形式ではないようです。');
+        return;
+      }
+      const ok = confirm(
+        `本 ${data.books.length}件、映像 ${data.videos.length}件を復元します。\n` +
+        `今のデータは上書きされます。よろしいですか？`
+      );
+      if (!ok) return;
+
+      books = data.books;
+      videos = data.videos;
+      const allIds = [...books, ...videos].map(d => d.id);
+      nextId = allIds.length ? Math.max(...allIds) + 1 : 200;
+
+      saveData();
+      renderCabinet();
+      alert('復元が完了しました。');
+    } catch (err) {
+      console.error(err);
+      alert('ファイルの読み込みに失敗しました。JSON形式を確認してください。');
+    }
+  };
+  reader.readAsText(file);
+}
+
+document.getElementById('export-btn').addEventListener('click', exportData);
+
+const importBtn = document.getElementById('import-btn');
+const importFileInput = document.getElementById('import-file-input');
+importBtn.addEventListener('click', () => importFileInput.click());
+importFileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) importData(file);
+  importFileInput.value = '';
+});
 /* ---- init ---- */
 loadData();
 document.querySelector('.tab[data-type="book"]').classList.add('active');
