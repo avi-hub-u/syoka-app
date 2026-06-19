@@ -1,6 +1,6 @@
 {
   "name": "わたしの書架",
-  "short_name": "書架",
+  "short_name": "わたしの書架",
   "description": "本・映画・ドラマの記録アプリ",
   "start_url": "./",
   "display": "standalone",
