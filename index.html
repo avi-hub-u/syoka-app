@@ -668,6 +668,9 @@
         <option value="unext">U-NEXT</option>
         <option value="other">その他</option>
       </select>
+      <label>画像（任意）</label>
+<input type="file" name="poster" id="poster-input" accept="image/*">
+<div id="poster-preview" style="margin-top:8px;"></div>
     </div>
 
     <label>日付</label>
@@ -1004,6 +1007,26 @@ formBackdrop.addEventListener('click', () => {
   formSheet.classList.remove('open');
   formBackdrop.classList.remove('open');
 });
+  let currentPosterData = null;
+
+document.getElementById('poster-input').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  const preview = document.getElementById('poster-preview');
+  if (!file) {
+    currentPosterData = null;
+    preview.innerHTML = '';
+    return;
+  }
+  preview.innerHTML = '読み込み中…';
+  try {
+    currentPosterData = await compressImage(file);
+    preview.innerHTML = `<img src="${currentPosterData}" style="max-width:120px; border-radius:4px;">`;
+  } catch (err) {
+    console.error(err);
+    preview.innerHTML = '画像の読み込みに失敗しました';
+    currentPosterData = null;
+  }
+});
 
 entryForm.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -1017,8 +1040,7 @@ entryForm.addEventListener('submit', (e) => {
       if (idx !== -1) books[idx] = { id: editingId, title, author: fd.get('author').trim(), genre: fd.get('genre'), date: fd.get('date'), comment: fd.get('comment').trim() };
     } else {
       const idx = videos.findIndex(v => v.id === editingId);
-      if (idx !== -1) videos[idx] = { id: editingId, title, platform: fd.get('platform'), date: fd.get('date'), comment: fd.get('comment').trim() };
-    }
+      if (idx !== -1) videos[idx] = { id: editingId, title, platform: fd.get('platform'), date: fd.get('date'), comment: fd.get('comment').trim(), poster: currentPosterData || (videos[idx] ? videos[idx].poster : null) };
     editingId = null;
   } else {
     if (currentType === 'book') {
@@ -1034,7 +1056,37 @@ entryForm.addEventListener('submit', (e) => {
   saveData();
   renderCabinet();
 });
-  
+
+  /* ---------- 画像圧縮 ---------- */
+function compressImage(file, maxSize = 400, quality = 0.7) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width;
+        let h = img.height;
+        if (w > h && w > maxSize) {
+          h = Math.round(h * (maxSize / w));
+          w = maxSize;
+        } else if (h > maxSize) {
+          w = Math.round(w * (maxSize / h));
+          h = maxSize;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 /* ---------- 保存 / 復元 ---------- */
 function exportData() {
   const data = {
