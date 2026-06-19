@@ -1,10 +1,9 @@
 const CACHE_NAME = 'watashi-no-shoka-v2';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/icon.png'
+  './',
+  './index.html',
+  './icon.png'
 ];
-
 // インストール時にキャッシュ
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -12,7 +11,6 @@ self.addEventListener('install', (e) => {
   );
   self.skipWaiting();
 });
-
 // 古いキャッシュを削除
 self.addEventListener('activate', (e) => {
   e.waitUntil(
@@ -24,7 +22,6 @@ self.addEventListener('activate', (e) => {
   );
   self.clients.claim();
 });
-
 // ネットワーク優先、失敗したらキャッシュ
 self.addEventListener('fetch', (e) => {
   e.respondWith(
