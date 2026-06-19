@@ -1046,8 +1046,7 @@ entryForm.addEventListener('submit', (e) => {
     if (currentType === 'book') {
       books.push({ id: nextId++, title, author: fd.get('author').trim(), genre: fd.get('genre'), date: fd.get('date'), comment: fd.get('comment').trim() });
     } else {
-      videos.push({ id: nextId++, title, platform: fd.get('platform'), date: fd.get('date'), comment: fd.get('comment').trim() });
-    }
+      videos.push({ id: nextId++, title, platform: fd.get('platform'), date: fd.get('date'), comment: fd.get('comment').trim(), poster: currentPosterData });
   }
 
   entryForm.reset();
