@@ -1051,14 +1051,15 @@ entryForm.addEventListener('submit', (e) => {
     } else {
       const idx = videos.findIndex(v => v.id === editingId);
       if (idx !== -1) videos[idx] = { id: editingId, title, platform: fd.get('platform'), date: fd.get('date'), comment: fd.get('comment').trim(), poster: currentPosterData || (videos[idx] ? videos[idx].poster : null) };
-    editingId = null;
+    }
+      editingId = null;
   } else {
     if (currentType === 'book') {
       books.push({ id: nextId++, title, author: fd.get('author').trim(), genre: fd.get('genre'), date: fd.get('date'), comment: fd.get('comment').trim() });
     } else {
       videos.push({ id: nextId++, title, platform: fd.get('platform'), date: fd.get('date'), comment: fd.get('comment').trim(), poster: currentPosterData });
   }
-
+}
   entryForm.reset();
   formSheet.classList.remove('open');
   formBackdrop.classList.remove('open');
