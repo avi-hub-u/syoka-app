@@ -2,14 +2,14 @@
   "name": "わたしの書架",
   "short_name": "書架",
   "description": "本・映画・ドラマの記録アプリ",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#18120e",
   "theme_color": "#18120e",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icon.png",
+      "src": "./icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
