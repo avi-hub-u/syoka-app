@@ -799,7 +799,7 @@ function makeDvdEl(item) {
 function renderCabinet() {
   cabinet.innerHTML = '';
   const data = currentType === 'book' ? books : videos;
-  const capacity = currentType === 'book' ? 6 : 4;
+  const capacity = currentType === 'book' ? 6 : 3;
   const shelvesNeeded = Math.max(2, Math.ceil(data.length / capacity) + 1);
 
   for (let s = 0; s < shelvesNeeded; s++) {
