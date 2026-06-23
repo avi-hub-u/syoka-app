@@ -1195,13 +1195,13 @@ renderCabinet();
 (function () {
   const splash = document.getElementById('splash-screen');
   if (!splash) return;
+
+  splash.classList.add('hide');
+
   setTimeout(() => {
-    splash.classList.add('hide');
-    setTimeout(() => {
-      splash.classList.add('done');
-      setTimeout(() => splash.remove(), 300);
-    }, 600);
-  }, 800);
+    splash.classList.add('done');
+    setTimeout(() => splash.remove(), 300);
+  }, 600);
 })();
 </script>
 </body>
