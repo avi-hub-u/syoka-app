@@ -604,6 +604,32 @@
     border: none;
     color: #2c2018;
   }
+#splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #18120e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#splash-logo {
+  width: 160px;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+#splash-screen.hide #splash-logo {
+  opacity: 0;
+  transform: translateY(-40px);
+}
+
+#splash-screen.done {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
 </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#18120e">
@@ -613,9 +639,13 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
   }
+  
 </script>
 </head>
 <body>
+<div id="splash-screen">
+  <img id="splash-logo" src="splash-logo.png" alt="ロゴ">
+</div>
   
 <div class="room">
   <div class="hero">
@@ -1162,6 +1192,17 @@ loadData();
 document.querySelector('.tab[data-type="book"]').classList.add('active');
 renderLegend();
 renderCabinet();
+(function () {
+  const splash = document.getElementById('splash-screen');
+  if (!splash) return;
+  setTimeout(() => {
+    splash.classList.add('hide');
+    setTimeout(() => {
+      splash.classList.add('done');
+      setTimeout(() => splash.remove(), 300);
+    }, 600);
+  }, 800);
+})();
 </script>
 </body>
 </html>
