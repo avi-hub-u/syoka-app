@@ -790,7 +790,7 @@ function makeBookEl(item) {
   el.className = 'item book';
   el.dataset.id = item.id;
  const width = 28 + (item.title.length * 2);
-  const height = 88 + (seed % 10);
+ const height = 88 + (item.id % 10);
   el.style.width = width + 'px';
   el.style.height = height + '%';
   el.style.background = bookGradient(item);
