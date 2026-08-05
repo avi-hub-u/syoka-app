@@ -790,7 +790,7 @@ function makeBookEl(item) {
   el.className = 'item book';
   el.dataset.id = item.id;
  const seed = item.id * 9301 % 233;
- const width = 30 + (seed % 18);
+ const width = Math.min(68, Math.max(32, item.title.length * 3.5 + 20));
  const height = 88 + (seed % 10);
   el.style.width = width + 'px';
   el.style.height = height + '%';
