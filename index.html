@@ -33,6 +33,7 @@
     --p-netflix: #a31f27;
     --p-amazon: #3f6ea0;
     --p-unext: #5d3a78;
+    --p-terrestrial: #3a6e4f;
     --p-other: #6b6258;
   }
 
@@ -708,11 +709,13 @@
     <div id="field-video">
       <label>見た媒体</label>
       <select name="platform">
-        <option value="theater">映画館</option>
+        <option value="terrestrial">地上波</option>
         <option value="netflix">Netflix</option>
         <option value="amazon">Amazon Prime Video</option>
         <option value="unext">U-NEXT</option>
+        <option value="theater">映画館</option>
         <option value="other">その他</option>
+      </select>
       </select>
       <label>画像（任意）</label>
 <input type="file" name="poster" id="poster-input" accept="image/*">
@@ -743,10 +746,11 @@ const genreMeta = {
 };
 
 const platformMeta = {
-  theater: { label: '映画館',       color: 'var(--p-theater)' },
+  terrestrial:  { label: '地上波',       color: 'var(--p-terrestrial)' },
   netflix: { label: 'Netflix',      color: 'var(--p-netflix)' },
   amazon:  { label: 'Prime Video',  color: 'var(--p-amazon)' },
   unext:   { label: 'U-NEXT',       color: 'var(--p-unext)' },
+  theater: { label: '映画館',       color: 'var(--p-theater)' },
   other:   { label: 'その他',       color: 'var(--p-other)' },
 };
 
