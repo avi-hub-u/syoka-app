@@ -230,6 +230,20 @@
   }
   .item:hover { transform: translateY(-6px); }
   .item.hidden { visibility: hidden; }
+  .item.drag-source { opacity: .3; }
+  .item.drop-target {
+    outline: 2px dashed var(--gold-soft);
+    outline-offset: 2px;
+  }
+  .drag-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 50;
+    opacity: .95;
+    transform: scale(1.05) rotate(-2deg);
+    transition: none !important;
+    box-shadow: 0 12px 24px rgba(0,0,0,.5);
+  }
 
   .item.book, .book-face {
     height: 100%;
@@ -1036,7 +1050,10 @@ card.querySelector('.cover-delete').addEventListener('click', () => {
   });
 }
 
+let justDragged = false;
+
 cabinet.addEventListener('click', (e) => {
+  if (justDragged) { justDragged = false; return; }
   const el = e.target.closest('.item');
   if (!el) return;
   const id = Number(el.dataset.id);
@@ -1044,6 +1061,108 @@ cabinet.addEventListener('click', (e) => {
   const item = data.find(d => d.id === id);
   if (item) openItem(el, item, currentType);
 });
+
+/* ---------- 長押しで並び替え ---------- */
+let pressTimer = null;
+let dragInfo = null;
+const LONG_PRESS_MS = 450;
+const MOVE_CANCEL_PX = 10;
+
+cabinet.addEventListener('pointerdown', (e) => {
+  const el = e.target.closest('.item');
+  if (!el) return;
+  const startX = e.clientX, startY = e.clientY;
+
+  const cancel = () => {
+    clearTimeout(pressTimer);
+    cabinet.removeEventListener('pointermove', onEarlyMove);
+    cabinet.removeEventListener('pointerup', onEarlyUp);
+  };
+  const onEarlyMove = (ev) => {
+    if (Math.abs(ev.clientX - startX) > MOVE_CANCEL_PX || Math.abs(ev.clientY - startY) > MOVE_CANCEL_PX) {
+      cancel();
+    }
+  };
+  const onEarlyUp = () => cancel();
+
+  cabinet.addEventListener('pointermove', onEarlyMove);
+  cabinet.addEventListener('pointerup', onEarlyUp);
+
+  pressTimer = setTimeout(() => {
+    cabinet.removeEventListener('pointermove', onEarlyMove);
+    cabinet.removeEventListener('pointerup', onEarlyUp);
+    startDrag(el, startX, startY);
+  }, LONG_PRESS_MS);
+});
+
+function startDrag(el, startX, startY) {
+  if (navigator.vibrate) navigator.vibrate(15);
+  const rect = el.getBoundingClientRect();
+  const ghost = el.cloneNode(true);
+  ghost.className = el.className + ' drag-ghost';
+  ghost.style.width = rect.width + 'px';
+  ghost.style.height = rect.height + 'px';
+  ghost.style.left = rect.left + 'px';
+  ghost.style.top = rect.top + 'px';
+  document.body.appendChild(ghost);
+
+  el.classList.add('drag-source');
+
+  dragInfo = {
+    id: Number(el.dataset.id),
+    offsetX: startX - rect.left,
+    offsetY: startY - rect.top,
+    hoverEl: null,
+  };
+
+  const onMove = (ev) => {
+    if (!dragInfo) return;
+    ghost.style.left = (ev.clientX - dragInfo.offsetX) + 'px';
+    ghost.style.top = (ev.clientY - dragInfo.offsetY) + 'px';
+
+    ghost.style.display = 'none';
+    const under = document.elementFromPoint(ev.clientX, ev.clientY);
+    ghost.style.display = '';
+
+    if (dragInfo.hoverEl) dragInfo.hoverEl.classList.remove('drop-target');
+    const hoverItem = under && under.closest ? under.closest('.item') : null;
+    if (hoverItem && hoverItem !== el) {
+      hoverItem.classList.add('drop-target');
+      dragInfo.hoverEl = hoverItem;
+    } else {
+      dragInfo.hoverEl = null;
+    }
+  };
+
+  const onUp = () => {
+    document.removeEventListener('pointermove', onMove);
+    document.removeEventListener('pointerup', onUp);
+    ghost.remove();
+    el.classList.remove('drag-source');
+    if (dragInfo.hoverEl) {
+      dragInfo.hoverEl.classList.remove('drop-target');
+      const targetId = Number(dragInfo.hoverEl.dataset.id);
+      reorderItems(dragInfo.id, targetId);
+    }
+    dragInfo = null;
+    justDragged = true;
+    setTimeout(() => { justDragged = false; }, 50);
+  };
+
+  document.addEventListener('pointermove', onMove);
+  document.addEventListener('pointerup', onUp);
+}
+
+function reorderItems(sourceId, targetId) {
+  const data = currentType === 'book' ? books : videos;
+  const fromIndex = data.findIndex(d => d.id === sourceId);
+  const toIndex = data.findIndex(d => d.id === targetId);
+  if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
+  const [moved] = data.splice(fromIndex, 1);
+  data.splice(toIndex, 0, moved);
+  saveData();
+  renderCabinet();
+}
 
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
