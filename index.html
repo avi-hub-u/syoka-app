@@ -785,12 +785,16 @@ function bookGradient(item) {
   return `linear-gradient(160deg, ${genreMeta[item.genre].color}, rgba(0,0,0,.35))`;
 }
 
+function bookWidth(item) {
+  return Math.min(52, Math.max(30, item.title.length * 2.6 + 18));
+}
+
 function makeBookEl(item) {
   const el = document.createElement('div');
   el.className = 'item book';
   el.dataset.id = item.id;
  const seed = item.id * 9301 % 233;
- const width = Math.min(68, Math.max(32, item.title.length * 3.5 + 20));
+ const width = bookWidth(item);
  const height = 88 + (seed % 10);
   el.style.width = width + 'px';
   el.style.height = height + '%';
@@ -821,11 +825,42 @@ function makeDvdEl(item) {
   return el;
 }
 
+function packBooksIntoShelves(data, maxWidth) {
+  const gap = 3;
+  const shelves = [];
+  let current = [];
+  let currentWidth = 0;
+  data.forEach(item => {
+    const w = bookWidth(item);
+    const addWidth = current.length === 0 ? w : w + gap;
+    if (currentWidth + addWidth > maxWidth && current.length > 0) {
+      shelves.push(current);
+      current = [item];
+      currentWidth = w;
+    } else {
+      current.push(item);
+      currentWidth += addWidth;
+    }
+  });
+  if (current.length) shelves.push(current);
+  return shelves;
+}
+
 function renderCabinet() {
   cabinet.innerHTML = '';
   const data = currentType === 'book' ? books : videos;
-  const capacity = currentType === 'book' ? 6 : 3;
-  const shelvesNeeded = Math.max(2, Math.ceil(data.length / capacity) + 1);
+
+  let chunks;
+  if (currentType === 'book') {
+    chunks = packBooksIntoShelves(data, 300);
+  } else {
+    const capacity = 3;
+    chunks = [];
+    for (let i = 0; i < data.length; i += capacity) {
+      chunks.push(data.slice(i, i + capacity));
+    }
+  }
+  const shelvesNeeded = Math.max(2, chunks.length + 1);
 
   for (let s = 0; s < shelvesNeeded; s++) {
     const shelf = document.createElement('div');
@@ -834,7 +869,7 @@ function renderCabinet() {
     const row = document.createElement('div');
     row.className = 'row';
 
-    const chunk = data.slice(s * capacity, (s + 1) * capacity);
+    const chunk = chunks[s] || [];
     if (chunk.length === 0) {
       const note = document.createElement('div');
       note.className = 'empty-note';
