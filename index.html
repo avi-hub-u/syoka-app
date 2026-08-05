@@ -801,7 +801,7 @@ function makeBookEl(item) {
   el.style.height = height + '%';
   el.style.background = bookGradient(item);
   el.textContent = item.title;
-  const fontSize = Math.max(8, 11 - Math.max(0, item.title.length - 6) * 0.3);
+  const fontSize = Math.max(9, 11 - Math.max(0, item.title.length - 8) * 0.15);
   el.style.fontSize = fontSize + 'px';
   return el;
 }
